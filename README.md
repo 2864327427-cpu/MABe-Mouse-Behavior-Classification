@@ -38,6 +38,59 @@
 - `src/models.py`：封装了具有动态正负样本重平衡的 `StratifiedSubsetClassifierWEval`。
 - `src/post_precessing.py`：自适应多分类阈值与时序平滑逻辑。
 
+## ⚙️ 运行方式
+
+### 1. 安装依赖
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. 数据准备
+
+从 [Kaggle MABe Challenge](https://kaggle.com/competitions/mabe-mouse-behavior-detection) 下载完整数据集，将数据放入项目根目录的 `input/` 文件夹，结构如下：
+
+```text
+input/
+└── mabe-mouse-behavior-detection/
+    ├── train.csv
+    ├── test.csv
+    ├── train_tracking/       # 训练集姿态跟踪数据
+    ├── train_annotation/     # 训练集标注
+    └── test_tracking/        # 测试集姿态跟踪数据
+```
+
+### 3. 训练
+
+```bash
+python scripts/train.py --gpu 0
+```
+
+或使用启动脚本：
+```bash
+bash scripts/run_gpu0.sh
+```
+
+训练脚本支持以下参数：
+- `--gpu`：指定 GPU 编号（默认 `0`）
+- `--model_name`：模型名称
+- `--target_pos_ratio`：正样本目标比例（默认 `0.01`）
+- `--single_transform_version` / `--pair_transform_version`：特征版本号
+
+训练完成后，模型文件将保存至 `artifacts/` 目录。
+
+### 4. 推理与提交
+
+```bash
+python scripts/inference.py --gpu 0
+```
+
+推理脚本会：
+1. 加载已保存的模型文件
+2. 对测试集进行特征工程
+3. 按 `(body_parts_tracked, action)` 组合执行推理
+4. 输出 `submission.csv` 提交文件
+
 ## 🛠 技术栈
 
 Python | XGBoost | Pandas | NumPy | SciPy | Parquet
